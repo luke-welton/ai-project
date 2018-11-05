@@ -19,8 +19,10 @@ def is_valid(value):
 
     value /= 3
     while value > 1:
-        if value % 2 != 0: return False
-        value /= 2
+        if value % 2 != 0:
+            return False
+        else:
+            value /= 2
 
     return True
 
@@ -237,16 +239,3 @@ class Board:
             if self.spaces[x][y] is None:
                 self.spaces[x][y] = new_tile
                 placed = True
-
-
-def main():
-    start = Board()
-
-    print("Start:\n{}".format(start))
-
-    for direction in Directions:
-        print("{}:\n{}".format(direction, Board(start, direction)))
-
-
-if __name__ == "__main__":
-    main()
