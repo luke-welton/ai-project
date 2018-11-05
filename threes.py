@@ -58,7 +58,7 @@ class Tile:
         self.value += to_merge.value
 
         if not is_valid(self.value):
-            raise InvalidTileValue
+            raise InvalidTileValue("The value of the tile was not 1, 2, or 3(2)^n for any n.")
 
 
 class Directions(Enum):
@@ -95,7 +95,7 @@ class Board:
             self.calculate_tiles(direction)
 
             if self == prev:
-                raise InvalidMove
+                raise InvalidMove("The generated board was not different from the previous board.")
             else:
                 self.place_new_tile(prev.next_tile, direction)
 
@@ -213,7 +213,7 @@ class Board:
                         if left.value > self.max_value:
                             self.max_value = left.value
         else:
-            raise InvalidMove
+            raise InvalidMove("An invalid integer was passed to the Board constructor for direction.")
 
     # places a tile randomly on the board
     def place_new_tile(self, new_tile, direction):
