@@ -239,3 +239,12 @@ class Board:
             if self.spaces[x][y] is None:
                 self.spaces[x][y] = new_tile
                 placed = True
+
+    def calculate_score(self):
+        score = 0
+        for row in self.spaces:
+            for cell in row:
+                if cell is not None and cell.value >= 3:
+                    score += 3 ** (log(cell.value / 3, 2) + 1)
+
+        return score
