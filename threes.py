@@ -40,9 +40,9 @@ class Tile:
         else:
             r = random.random()
 
-            if r > 2/3:
+            if r > 2.0/3.0:
                 self.value = 2
-            elif r > 1/3:
+            elif r > 1.0/3.0:
                 self.value = 1
             else:
                 self_max = max_value / 2
@@ -82,7 +82,6 @@ class Board:
     def __init__(self, prev=None, direction=-1):
         if prev is None:
             self.max_value = 3
-
             self.spaces = []
             for _ in range(4):
                 arr = []
@@ -110,12 +109,13 @@ class Board:
                 self.place_new_tile(prev.next_tile, direction)
 
         self.next_tile = Tile(self.max_value)
+        self.score = self.calculate_score()
 
     def __eq__(self, other):
         try:
             for i in range(len(self.spaces)):
                 for j in range(len(self.spaces[i])):
-                    if self.spaces[i][j] != other.spaces[i][j]:
+                    if self.spaces[i][j].value != other.spaces[i][j].value:
                         return False
             return True
         except (AttributeError, IndexError):
@@ -247,6 +247,7 @@ class Board:
             if self.spaces[x][y] is None:
                 self.spaces[x][y] = new_tile
                 placed = True
+                self.score = self.calculate_score()
 
     def calculate_score(self):
         score = 0
