@@ -109,7 +109,6 @@ class Board:
                 self.place_new_tile(prev.next_tile, direction)
 
         self.next_tile = Tile(self.max_value)
-        self.score = self.calculate_score()
 
     def __eq__(self, other):
         try:
@@ -247,7 +246,6 @@ class Board:
             if self.spaces[x][y] is None:
                 self.spaces[x][y] = new_tile
                 placed = True
-                self.score = self.calculate_score()
 
     def calculate_score(self):
         score = 0
