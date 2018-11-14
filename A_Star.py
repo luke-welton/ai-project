@@ -116,8 +116,9 @@ def a_star(print_nodes=False):
 
         if print_nodes:
             print(node.board)
+            print(best_score)
 
-        if node.board.calculate_score() == MAX_SCORE:
+        if node.board.calculate_score() >= MAX_SCORE:
             best_score = node.board.score
             break
 
