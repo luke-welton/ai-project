@@ -1,5 +1,5 @@
 import random
-from math import log
+from math import log2
 from copy import deepcopy
 from enum import Enum
 
@@ -46,7 +46,7 @@ class Tile:
                 self.value = 1
             else:
                 self_max = max_value / 2
-                num_vals = int(log(self_max / 3, 2))
+                num_vals = int(log2(self_max / 3))
                 divisor = 2 ** num_vals - 1  # sum of 2^n for all n < num_vals
 
                 for i in range(num_vals):
@@ -253,6 +253,6 @@ class Board:
         for row in self.spaces:
             for cell in row:
                 if cell is not None and cell.value >= 3:
-                    score += 3 ** (log(cell.value / 3, 2) + 1)
+                    score += 3 ** (log2(cell.value / 3) + 1)
 
         return int(score)
