@@ -1,9 +1,5 @@
-from threes import Board
-from threes import Directions
+from A_Star import a_star
+
 
 if __name__ == "__main__":
-    start = Board()
-    print("Start:\n{}".format(start))
-
-    for direction in Directions:
-        print("{}:\n{}".format(direction, Board(start, direction)))
+    a_star(True)

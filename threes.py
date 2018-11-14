@@ -1,10 +1,14 @@
 import random
-from math import log
+from math import log2
 from copy import deepcopy
 from enum import Enum
 
 
 class InvalidTileValue(Exception):
+    pass
+
+
+class InvalidDirection(Exception):
     pass
 
 
@@ -28,27 +32,31 @@ def is_valid(value):
 
 
 class Tile:
-    def __init__(self, max_value):
+    def __init__(self, max_value, force_value=False):
         self.value = 0
-        r = random.random()
 
-        if r > 2/3:
-            self.value = 2
-        elif r > 1/3:
-            self.value = 1
+        if force_value:
+            self.value = max_value
         else:
-            self_max = max_value / 2
-            num_vals = int(log(self_max / 3, 2))
-            divisor = 2 ** num_vals - 1  # sum of 2^n for all n < num_vals
+            r = random.random()
 
-            for i in range(num_vals):
-                if r < (2 ** i) / divisor * 1/3:
-                    self.value = 3 * 2 ** (num_vals - i)
-                    break
+            if r > 2.0/3.0:
+                self.value = 2
+            elif r > 1.0/3.0:
+                self.value = 1
+            else:
+                self_max = max_value / 2
+                num_vals = int(log2(self_max / 3))
+                divisor = 2 ** num_vals - 1  # sum of 2^n for all n < num_vals
 
-            # if the value should be 3, then it will currently be 0
-            if self.value == 0:
-                self.value = 3
+                for i in range(num_vals):
+                    if r < (2 ** i) / divisor * 1/3:
+                        self.value = 3 * 2 ** (num_vals - i)
+                        break
+
+                # if the value should be 3, then it will currently be 0
+                if self.value == 0:
+                    self.value = 3
 
     def __eq__(self, other):
         try:
@@ -74,7 +82,6 @@ class Board:
     def __init__(self, prev=None, direction=-1):
         if prev is None:
             self.max_value = 3
-
             self.spaces = []
             for _ in range(4):
                 arr = []
@@ -107,7 +114,7 @@ class Board:
         try:
             for i in range(len(self.spaces)):
                 for j in range(len(self.spaces[i])):
-                    if self.spaces[i][j] != other.spaces[i][j]:
+                    if self.spaces[i][j].value != other.spaces[i][j].value:
                         return False
             return True
         except (AttributeError, IndexError):
@@ -215,7 +222,7 @@ class Board:
                         if left.value > self.max_value:
                             self.max_value = left.value
         else:
-            raise InvalidMove("An invalid integer was passed to the Board constructor for direction.")
+            raise InvalidDirection("An invalid integer was passed to the Board constructor for direction.")
 
     # places a tile randomly on the board
     def place_new_tile(self, new_tile, direction):
@@ -245,6 +252,6 @@ class Board:
         for row in self.spaces:
             for cell in row:
                 if cell is not None and cell.value >= 3:
-                    score += 3 ** (log(cell.value / 3, 2) + 1)
+                    score += 3 ** (log2(cell.value / 3) + 1)
 
-        return score
+        return int(score)
