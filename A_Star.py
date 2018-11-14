@@ -88,8 +88,13 @@ def a_star(print_nodes=False):
 
         if print_nodes:
             print(node.board)
+            print(best_score)
 
         if node.board.score == MAX_SCORE:
+            best_score = node.board.score
+            break
+
+        if node.board.score > MAX_SCORE:
             best_score = node.board.score
             break
 
@@ -110,3 +115,43 @@ def a_star(print_nodes=False):
                     open_node.update_node(next_node)
 
     print("Best Score for A*:\t{}".format(best_score))
+
+
+# Picking the direction that will increase the score by the most with no backtracking
+def greedy():
+    f = open('output.txt', 'w+')
+    best_score = 0
+    num_runs = 100
+    best_board = Board()
+
+    for i in range(0, num_runs):
+        board = Board()
+        next_board = Board()
+        can_move = True
+        current_score = 0
+        # f.write("Score: " + str(current_score) + "\n" + str(board) + "\n\n")
+        while can_move and best_score < MAX_SCORE:
+            can_move = False
+            for direction in Directions:
+                try:
+                    this_next_board = Board(prev=board, direction=direction)
+                    # print("Board when moving " + str(direction) + ":\n" + str(this_next_board))
+                    this_score = this_next_board.calculate_score()
+                    can_move = True
+                    if this_score >= current_score:
+                        current_score = this_score
+                        next_board = this_next_board
+                except InvalidMove:
+                    pass
+            if can_move:
+                f.write("Score: " + str(current_score) + "\n" + str(next_board) + "\n\n")
+                board = next_board
+        # f.write("Final Score: " + str(current_score) + "\n" + str(board) + "\n\n")
+        # f.write("//////////////////\n\n")
+        if current_score > best_score:
+            best_score = current_score
+            best_board = board
+    print("Best score achieved is: " + str(best_score))
+    print(best_board)
+
+
