@@ -44,9 +44,9 @@ class Tile:
         else:
             r = random.random()
 
-            if r > 2/3:
+            if r > 2 / 3:
                 self.value = 2
-            elif r > 1/3:
+            elif r > 1 / 3:
                 self.value = 1
             else:
                 self.value = 3
@@ -55,7 +55,7 @@ class Tile:
                 divisor = 2 ** num_vals - 1  # sum of 2^n for all n < num_vals
 
                 for i in range(num_vals):
-                    if r < (2 ** i) / divisor * 1/3:
+                    if r < (2 ** i) / divisor * 1 / 3:
                         self.value = 3 * 2 ** (num_vals - i)
                         break
 
@@ -111,7 +111,8 @@ class Board:
             self.next_tile = None
 
             if self == prev:
-                raise InvalidMove("The generated board was not different from the previous board.\n" + str(prev) + "\n" + str(self))
+                raise InvalidMove(
+                    "The generated board was not different from the previous board.\n" + str(prev) + "\n" + str(self))
             elif add_tile:
                 self.place_new_tile(prev.next_tile, direction)
 
@@ -153,9 +154,9 @@ class Board:
                     upper = self.spaces[i][j]
                     lower = self.spaces[i + 1][j]
 
-                    if upper is None:
+                    if upper is None or upper.value == 0:
                         continue
-                    elif lower is None:
+                    elif lower is None or lower.value == 0:
                         self.spaces[i + 1][j] = upper
                         self.spaces[i][j] = None
                     elif upper == lower and upper.value >= 3 \
@@ -176,9 +177,9 @@ class Board:
                     left = self.spaces[i][j]
                     right = self.spaces[i][j + 1]
 
-                    if left is None:
+                    if left is None or left.value == 0:
                         continue
-                    elif right is None:
+                    elif right is None or right.value == 0:
                         self.spaces[i][j + 1] = left
                         self.spaces[i][j] = None
                     elif left == right and left.value >= 3 \
@@ -196,9 +197,9 @@ class Board:
                     upper = self.spaces[i - 1][j]
                     lower = self.spaces[i][j]
 
-                    if lower is None:
+                    if lower is None or lower.value == 0:
                         continue
-                    elif upper is None:
+                    elif upper is None or upper.value == 0:
                         self.spaces[i - 1][j] = lower
                         self.spaces[i][j] = None
                     elif upper == lower and upper.value >= 3 \
@@ -216,9 +217,9 @@ class Board:
                     left = self.spaces[i][j - 1]
                     right = self.spaces[i][j]
 
-                    if right is None:
+                    if right is None or right.value == 0:
                         continue
-                    elif left is None:
+                    elif left is None or right.value == 0:
                         self.spaces[i][j - 1] = right
                         self.spaces[i][j] = None
                     elif left == right and left.value >= 3 \
@@ -230,7 +231,8 @@ class Board:
                         if left.value > self.max_value:
                             self.max_value = left.value
         else:
-            raise InvalidDirection("An invalid integer was passed to the Board constructor for direction." + str(direction))
+            raise InvalidDirection(
+                "An invalid integer was passed to the Board constructor for direction." + str(direction))
 
     # places a tile randomly on the board
     def place_new_tile(self, new_tile, direction, x=-1, y=-1):
@@ -283,3 +285,11 @@ class Board:
                     score += 3 ** (log(cell.value / 3, 2) + 1)
 
         return int(score)
+
+    def get_max_tile(self):
+        max_tile = 0
+        for row in self.spaces:
+            for cell in row:
+                if cell is not None and cell.value > max_tile:
+                    max_tile = cell.value
+        return max_tile

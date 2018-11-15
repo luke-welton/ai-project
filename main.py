@@ -1,8 +1,5 @@
 from A_Star import a_star
-from A_Star import greedy
-from expectimax import expectimax
-
+from expectimax import run_expectimax
 
 if __name__ == "__main__":
-    expectimax(2)
-
+    run_expectimax(25, 3)

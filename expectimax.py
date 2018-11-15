@@ -3,8 +3,8 @@ from copy import deepcopy
 
 
 class TreeNode(object):
-    def __init__(self, data, depth, value=0, direction=None):
-        self.data = data
+    def __init__(self, board, depth, value=0, direction=None):
+        self.board = board
         self.value = value
         self.depth = depth
         self.children = []
@@ -29,26 +29,14 @@ def sim_move(board, search_depth, tile_node):
             next_board = Board(prev=board, direction=direction, add_tile=False)
             node = TreeNode(next_board, tile_node.depth + 1, direction=direction)
             tile_node.add_child(node)
-            # print("Depth = " + str(node.depth) + " Direction = " + str(direction))
-            sim_place_tile(board, direction, search_depth, node)
+            sim_place_tile2(next_board, direction, search_depth, node)
         except InvalidMove:
             pass
 
 
+# Simulates tile placement and value on all tree levels
 def sim_place_tile(board, direction, search_depth, direction_node):
-    if direction_node.depth == 1:
-        for x, row in enumerate(board.spaces):
-            for y, space in enumerate(row):
-                if space is None:
-                    next_tile = board.next_tile
-                    board_copy = deepcopy(board)
-                    board_copy.place_new_tile(next_tile, direction, x=x, y=y)
-                    node = TreeNode(board_copy, direction_node.depth + 1)
-                    direction_node.add_child(node)
-                    # print("Depth = " + str(node.depth) + " Tile Value = " + str(next_tile.value))
-                    sim_move(board_copy, search_depth, node)
-
-    elif direction_node.depth + 1 == search_depth * 2:
+    if direction_node.depth + 1 == search_depth * 2:
         for x, row in enumerate(board.spaces):
             for y, space in enumerate(row):
                 if space is None:
@@ -57,20 +45,56 @@ def sim_place_tile(board, direction, search_depth, direction_node):
                         board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction, x=x, y=y)
                         node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_score())
                         direction_node.add_child(node)
-                        # print("Depth = " + str(node.depth) + " Tile Value = " + str(i))
         return
+    elif direction_node.depth == 1:
+        for x, row in enumerate(board.spaces):
+            for y, space in enumerate(row):
+                if space is None:
+                    next_tile = board.next_tile
+                    board_copy = deepcopy(board)
+                    board_copy.place_new_tile(next_tile, direction, x=x, y=y)
+                    node = TreeNode(board_copy, direction_node.depth + 1)
+                    direction_node.add_child(node)
+                    sim_move(board_copy, search_depth, node)
     else:
         for x, row in enumerate(board.spaces):
             for y, space in enumerate(row):
                 if space is None:
                     for i in range(1, 4):
                         board_copy = deepcopy(board)
-                        # need to be able to force location too
                         board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction, x=x, y=y)
                         node = TreeNode(board_copy, direction_node.depth + 1)
                         direction_node.add_child(node)
-                        # print("Depth = " + str(node.depth) + " Tile Value = " + str(i))
                         sim_move(board_copy, search_depth, node)
+
+
+# Simulates tile placement on first tree level and then only simulates tile value on future tree levels
+# Much faster if search_depth > 2
+def sim_place_tile2(board, direction, search_depth, direction_node):
+    if direction_node.depth + 1 == search_depth * 2:
+        for i in range(1, 4):
+            board_copy = deepcopy(board)
+            board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction)
+            node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_score())
+            direction_node.add_child(node)
+        return
+    elif direction_node.depth == 1:
+        for x, row in enumerate(board.spaces):
+            for y, space in enumerate(row):
+                if space is None:
+                    next_tile = board.next_tile
+                    board_copy = deepcopy(board)
+                    board_copy.place_new_tile(next_tile, direction, x=x, y=y)
+                    node = TreeNode(board_copy, direction_node.depth + 1)
+                    direction_node.add_child(node)
+                    sim_move(board_copy, search_depth, node)
+    else:
+        for i in range(1, 4):
+            board_copy = deepcopy(board)
+            board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction)
+            node = TreeNode(board_copy, direction_node.depth + 1)
+            direction_node.add_child(node)
+            sim_move(board_copy, search_depth, node)
 
 
 def calculate_average(node):
@@ -98,16 +122,40 @@ def pick_direction(tree):
 
 def expectimax(search_depth):
     board = Board()
-    print(board)
-    moves = 0
-    while moves < 1000:
+    # print(board)
+    while True:
         # Board will not accept a move if it does not combine tiles
         if not board.has_move():
-            return board
+            score = board.calculate_score()
+            max_tile = board.get_max_tile()
+            return [score, max_tile]
         tree_root = TreeNode(board, 0)
         sim_move(board, search_depth, tree_root)
         direction = pick_direction(tree_root)
         board = Board(prev=board, direction=direction)
-        print(board)
-        moves += 1
-    return 0
+        # print(board)
+
+
+def run_expectimax(iterations, search_depth):
+    score_sum = 0
+    max_tile_sum = 0
+    high_score = 0
+    high_max_tile = 0
+    for i in range(iterations):
+        ret = expectimax(search_depth)
+        score = ret[0]
+        max_tile = ret[1]
+        score_sum += score
+        max_tile_sum += max_tile
+        if score > high_score:
+            high_score = score
+        if max_tile > high_max_tile:
+            high_max_tile = max_tile
+        print("Score = " + str(score) + " Max Tile = " + str(max_tile))
+    avg_score = score_sum / iterations
+    avg_max_tile = max_tile_sum / iterations
+    print("Average score with search depth of " + str(search_depth) + ": " + str(avg_score))
+    print("Highest score with search depth of " + str(search_depth) + ": " + str(high_score))
+    print("Average max tile with search depth of " + str(search_depth) + ": " + str(avg_max_tile))
+    print("Highest max tile with search depth of " + str(search_depth) + ": " + str(high_max_tile))
+    print("\n\n\n")
