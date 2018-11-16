@@ -104,26 +104,27 @@ def calculate_max():
 MAX_SCORE = calculate_max()
 
 
-def a_star(print_nodes=False):
+def a_star(cap=-1, print_nodes=False):
     open_queue = PriorityQueue()
+    best_board = None
     best_score = 0
     num_checked = 0
 
     open_queue.enqueue(Node(Board()))
-    while len(open_queue) > 0 and num_checked < 5000:
+    while len(open_queue) > 0 and (cap < 0 or num_checked < cap):
         node = open_queue.dequeue()
         num_checked += 1
 
         if print_nodes:
             print(node.board)
-            print(best_score)
 
         if node.board.calculate_score() >= MAX_SCORE:
-            best_score = node.board.score
+            best_board = node.board
             break
 
         node.generate_next()
         if len(node.next) == 0 and node.board.calculate_score() > best_score:
+            best_board = node.board
             best_score = node.board.calculate_score()
         else:
             for next_node in node.next:
@@ -132,4 +133,4 @@ def a_star(print_nodes=False):
                 if open_node is None:
                     open_queue.enqueue(next_node)
 
-    print("Best Score for A*:\t{}".format(best_score))
+    return best_board.calculate_score(), best_board.max_value
