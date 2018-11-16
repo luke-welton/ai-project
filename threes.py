@@ -1,5 +1,5 @@
 import random
-from math import log
+from math import log2
 from copy import deepcopy
 from enum import Enum
 
@@ -44,18 +44,17 @@ class Tile:
         else:
             r = random.random()
 
-            if r > 2 / 3:
+            if r > 2/3:
                 self.value = 2
-            elif r > 1 / 3:
+            elif r > 1/3:
                 self.value = 1
             else:
-                self.value = 3
                 self_max = max_value / 2
-                num_vals = int(log(self_max / 3, 2))
+                num_vals = int(log2(self_max / 3))
                 divisor = 2 ** num_vals - 1  # sum of 2^n for all n < num_vals
 
                 for i in range(num_vals):
-                    if r < (2 ** i) / divisor * 1 / 3:
+                    if r < (2 ** i) / divisor * 1/3:
                         self.value = 3 * 2 ** (num_vals - i)
                         break
 
@@ -123,7 +122,7 @@ class Board:
         try:
             for i in range(len(self.spaces)):
                 for j in range(len(self.spaces[i])):
-                    if self.spaces[i][j] != other.spaces[i][j]:
+                    if self.spaces[i][j].value != other.spaces[i][j].value:
                         return False
             return True
         except (AttributeError, IndexError):
@@ -154,9 +153,9 @@ class Board:
                     upper = self.spaces[i][j]
                     lower = self.spaces[i + 1][j]
 
-                    if upper is None or upper.value == 0:
+                    if upper is None:
                         continue
-                    elif lower is None or lower.value == 0:
+                    elif lower is None:
                         self.spaces[i + 1][j] = upper
                         self.spaces[i][j] = None
                     elif upper == lower and upper.value >= 3 \
@@ -177,9 +176,9 @@ class Board:
                     left = self.spaces[i][j]
                     right = self.spaces[i][j + 1]
 
-                    if left is None or left.value == 0:
+                    if left is None:
                         continue
-                    elif right is None or right.value == 0:
+                    elif right is None:
                         self.spaces[i][j + 1] = left
                         self.spaces[i][j] = None
                     elif left == right and left.value >= 3 \
@@ -197,9 +196,9 @@ class Board:
                     upper = self.spaces[i - 1][j]
                     lower = self.spaces[i][j]
 
-                    if lower is None or lower.value == 0:
+                    if lower is None:
                         continue
-                    elif upper is None or upper.value == 0:
+                    elif upper is None:
                         self.spaces[i - 1][j] = lower
                         self.spaces[i][j] = None
                     elif upper == lower and upper.value >= 3 \
@@ -217,9 +216,9 @@ class Board:
                     left = self.spaces[i][j - 1]
                     right = self.spaces[i][j]
 
-                    if right is None or right.value == 0:
+                    if right is None:
                         continue
-                    elif left is None or right.value == 0:
+                    elif left is None:
                         self.spaces[i][j - 1] = right
                         self.spaces[i][j] = None
                     elif left == right and left.value >= 3 \
@@ -282,7 +281,7 @@ class Board:
         for row in self.spaces:
             for cell in row:
                 if cell is not None and cell.value >= 3:
-                    score += 3 ** (log(cell.value / 3, 2) + 1)
+                    score += 3 ** (log2(cell.value / 3) + 1)
 
         return int(score)
 

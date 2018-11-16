@@ -1,4 +1,5 @@
 from threes import Board, Directions, Tile, InvalidMove
+from math import sqrt, log2
 
 
 class Node:
@@ -11,7 +12,34 @@ class Node:
         if prev is not None:
             self.move_count += prev.move_count
 
-        self.distance = MAX_SCORE - board.calculate_score() + self.move_count
+        self.h = MAX_SCORE - self.board.calculate_score() + self.calculate_manhattan()
+
+    def calculate_manhattan(self):
+        distance = 0
+
+        for i in range(len(self.board.spaces)):
+            for j in range(len(self.board.spaces[i])):
+                for x in range(i):
+                    for y in range(j):
+                        try:
+                            a = self.board.spaces[i][j].value
+                            b = self.board.spaces[x][y].value
+
+                            if a == b and a >= 3 \
+                                    or a == 1 and b == 2 \
+                                    or a == 2 and b == 1:
+                                manhattan = sqrt((i - x) ** 2 + (j - y) ** 2)
+
+                                # we want to give preference to higher values, so multiply by logmax - log(value)
+                                logmax = int(log2(self.board.max_value / 3) + 1)
+                                if a == b:
+                                    distance += manhattan * int(logmax - log2(a / 3) - 1)
+                                else:
+                                    distance += manhattan * logmax
+                        except AttributeError:
+                            continue
+
+        return distance
 
     def generate_next(self):
         for direction in Directions:
@@ -38,7 +66,7 @@ class PriorityQueue:
     def dequeue(self):
         index = -1
         for i in range(len(self)):
-            if index < 0 or self.queue[i].distance < self.queue[index].distance:
+            if index < 0 or self.queue[i].h < self.queue[index].h:
                 index = i
 
         if index > -1:
@@ -76,45 +104,36 @@ def calculate_max():
 MAX_SCORE = calculate_max()
 
 
-def a_star(print_nodes=False):
+def a_star(cap=-1, print_nodes=False):
     open_queue = PriorityQueue()
-    closed_queue = PriorityQueue()
+    best_board = None
     best_score = 0
+    num_checked = 0
 
     open_queue.enqueue(Node(Board()))
-    while len(open_queue) > 0:
+    while len(open_queue) > 0 and (cap < 0 or num_checked < cap):
         node = open_queue.dequeue()
-        closed_queue.enqueue(node)
+        num_checked += 1
 
         if print_nodes:
             print(node.board)
-            print(best_score)
 
-        if node.board.score == MAX_SCORE:
-            best_score = node.board.score
-            break
-
-        if node.board.score > MAX_SCORE:
-            best_score = node.board.score
+        if node.board.calculate_score() >= MAX_SCORE:
+            best_board = node.board
             break
 
         node.generate_next()
-        if len(node.next) == 0 and node.board.score > best_score:
-            best_score = node.board.score
+        if len(node.next) == 0 and node.board.calculate_score() > best_score:
+            best_board = node.board
+            best_score = node.board.calculate_score()
         else:
             for next_node in node.next:
                 open_node = open_queue.find(next_node)
-                closed_node = closed_queue.find(next_node)
 
                 if open_node is None:
                     open_queue.enqueue(next_node)
 
-                    if closed_node is not None:
-                        closed_queue.remove(closed_node)
-                elif next_node.distance < open_node.distance:
-                    open_node.update_node(next_node)
-
-    print("Best Score for A*:\t{}".format(best_score))
+    return best_board.calculate_score(), best_board.max_value
 
 
 # Picking the direction that will increase the score by the most with no backtracking
