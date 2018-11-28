@@ -102,6 +102,7 @@ class Board:
         else:
             self.max_value = prev.max_value
             self.spaces = deepcopy(prev.spaces)
+            #self.copy(prev.spaces)
 
             if direction > 0:
                 self.calculate_tiles(direction)
@@ -162,6 +163,15 @@ class Board:
                 continue
             break
         return hasMoves
+
+    # Testing to see if this is faster than deepcopy
+    def copy(self, spaces):
+        self.spaces = [None] * 4
+        for i in range(len(spaces)):
+            self.spaces[i] = [None] * 4
+            for j in range(len(spaces[i])):
+                if spaces[i][j] is not None:
+                    self.spaces[i][j] = Tile(max_value=spaces[i][j].value, force_value=True)
 
     # Move the board in a direction.
     def move(self, direction):
