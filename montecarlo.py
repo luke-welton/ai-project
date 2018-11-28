@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 class MonteCarlo:
 
-    def __init__(self, depth=50, run=0, debug=False, print_results=True):
+    def __init__(self, depth=50, run=0, debug=False, print_results=True, plot=False):
         self.board = Board()
         self.run = run
         self.depth = depth
@@ -15,6 +15,7 @@ class MonteCarlo:
         self.playout_score_progress = []
         self.debug = debug
         self.print_results = print_results
+        self.plot = plot
 
     def reset(self):
         self.board = Board()
@@ -41,6 +42,8 @@ class MonteCarlo:
             print("[" + str(self.depth) + "]#" + str(self.run) + " | Score: " + str(self.score) + " | Highest tile: " + str(self.highest_tile) + " | Moves: " + str(self.moves))
         if self.debug:
             print(self.board)
+        if self.plot:
+            self.graph_results()
 
     # Calculate the next move from the current state of the board.
     def get_next_direction(self):
@@ -134,4 +137,4 @@ def graph_results(run, data, title, ytitle, save=False):
 
 
 # Here we go.     
-run_monte_carlo(runs=[1], depths=[50], debug=True, save=True)
+run_monte_carlo(runs=[2], depths=[50], debug=True, save=True)
