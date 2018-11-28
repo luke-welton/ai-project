@@ -72,6 +72,7 @@ class Tile:
 
 
 class Directions(Enum):
+    __order__ = 'up right down left'
     up = 0
     right = 1
     down = 2
@@ -101,12 +102,13 @@ class Board:
         else:
             self.max_value = prev.max_value
             self.spaces = deepcopy(prev.spaces)
-            self.calculate_tiles(direction)
 
-            if self == prev:
-                raise InvalidMove("The generated board was not different from the previous board.")
-            else:
-                self.place_new_tile(prev.next_tile, direction)
+            if direction > 0:
+                self.calculate_tiles(direction)
+                if self == prev:
+                    raise InvalidMove("The generated board was not different from the previous board.")
+                else:
+                    self.place_new_tile(prev.next_tile, direction)
 
         self.next_tile = Tile(self.max_value)
 
@@ -133,9 +135,46 @@ class Board:
             output += "\n"
         return output
 
+    # Does the board have more moves?
+    def has_moves(self):
+        hasMoves = False
+        for i in range(len(self.spaces)):
+            for j in range(len(self.spaces[i])):
+                if i > 0:
+                    upper = self.spaces[i - 1][j]
+                    lower = self.spaces[i][j]
+                    if upper == None or lower == None \
+                            or upper == lower and upper.value >= 3 \
+                            or upper.value == 1 and lower.value == 2 \
+                            or lower.value == 1 and upper.value == 2:
+                        hasMoves = True
+                        break
+                if j > 0:
+                    left = self.spaces[i][j - 1]
+                    right = self.spaces[i][j]
+                    if left == None or right == None \
+                            or left == right and left.value >= 3 \
+                            or left.value == 1 and right.value == 2 \
+                            or right.value == 1 and left.value == 2:
+                        hasMoves = True
+                        break
+            else:
+                continue
+            break
+        return hasMoves
+
+    # Move the board in a direction.
+    def move(self, direction):
+        moved = self.calculate_tiles(direction)
+        if moved:
+            self.place_new_tile(self.next_tile, direction)
+            self.next_tile = Tile(self.max_value)
+        return moved
+
     # function to calculate the new tiles after making a move
     # this function could pretty easily be condensed but it'd be a hell of a lot less readable
     def calculate_tiles(self, direction):
+        moved = False
         if direction == Directions.down:
             for i in range(len(self.spaces) - 1):
                 # we want to check from the bottom upward
@@ -150,11 +189,13 @@ class Board:
                     elif lower is None:
                         self.spaces[i + 1][j] = upper
                         self.spaces[i][j] = None
+                        moved = True
                     elif upper == lower and upper.value >= 3 \
                             or upper.value == 1 and lower.value == 2 \
                             or lower.value == 1 and upper.value == 2:
                         lower.merge(upper)
                         self.spaces[i][j] = None
+                        moved = True
 
                         if lower.value > self.max_value:
                             self.max_value = lower.value
@@ -173,11 +214,13 @@ class Board:
                     elif right is None:
                         self.spaces[i][j + 1] = left
                         self.spaces[i][j] = None
+                        moved = True
                     elif left == right and left.value >= 3 \
                             or left.value == 1 and right.value == 2 \
                             or right.value == 1 and left.value == 2:
                         right.merge(left)
                         self.spaces[i][j] = None
+                        moved = True
 
                         if right.value > self.max_value:
                             self.max_value = right.value
@@ -193,11 +236,13 @@ class Board:
                     elif upper is None:
                         self.spaces[i - 1][j] = lower
                         self.spaces[i][j] = None
+                        moved = True
                     elif upper == lower and upper.value >= 3 \
                             or upper.value == 1 and lower.value == 2 \
                             or lower.value == 1 and upper.value == 2:
                         upper.merge(lower)
                         self.spaces[i][j] = None
+                        moved = True
 
                         if upper.value > self.max_value:
                             self.max_value = upper.value
@@ -213,16 +258,19 @@ class Board:
                     elif left is None:
                         self.spaces[i][j - 1] = right
                         self.spaces[i][j] = None
+                        moved = True
                     elif left == right and left.value >= 3 \
                             or left.value == 1 and right.value == 2 \
                             or right.value == 1 and left.value == 2:
                         left.merge(right)
                         self.spaces[i][j] = None
+                        moved = True
 
                         if left.value > self.max_value:
                             self.max_value = left.value
         else:
-            raise InvalidDirection("An invalid integer was passed to the Board constructor for direction.")
+            raise InvalidDirection("An invalid integer was passed to the Board constructor for direction: " + str(direction))
+        return moved
 
     # places a tile randomly on the board
     def place_new_tile(self, new_tile, direction):
