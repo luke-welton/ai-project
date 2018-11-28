@@ -16,6 +16,10 @@ class InvalidMove(Exception):
     pass
 
 
+class InvalidTilePlacement(Exception):
+    pass
+
+
 # checks whether or not a value is valid for a tile
 def is_valid(value):
     if value == 1 or value == 2:
@@ -40,9 +44,9 @@ class Tile:
         else:
             r = random.random()
 
-            if r > 2.0/3.0:
+            if r > 2/3:
                 self.value = 2
-            elif r > 1.0/3.0:
+            elif r > 1/3:
                 self.value = 1
             else:
                 self_max = max_value / 2
@@ -79,10 +83,11 @@ class Directions(Enum):
 
 
 class Board:
-    def __init__(self, prev=None, direction=-1):
+    def __init__(self, prev=None, direction=-1, add_tile=True):
         if prev is None:
             self.max_value = 3
             self.spaces = []
+            self.next_tile = Tile(self.max_value)
             for _ in range(4):
                 arr = []
                 for _ in range(4):
@@ -102,13 +107,16 @@ class Board:
             self.max_value = prev.max_value
             self.spaces = deepcopy(prev.spaces)
             self.calculate_tiles(direction)
+            self.next_tile = None
 
             if self == prev:
-                raise InvalidMove("The generated board was not different from the previous board.")
-            else:
+                raise InvalidMove(
+                    "The generated board was not different from the previous board.\n" + str(prev) + "\n" + str(self))
+            elif add_tile:
                 self.place_new_tile(prev.next_tile, direction)
 
-        self.next_tile = Tile(self.max_value)
+        # self.next_tile = Tile(self.max_value)
+        self.score = self.calculate_score()
 
     def __eq__(self, other):
         try:
@@ -222,30 +230,51 @@ class Board:
                         if left.value > self.max_value:
                             self.max_value = left.value
         else:
-            raise InvalidDirection("An invalid integer was passed to the Board constructor for direction.")
+            raise InvalidDirection(
+                "An invalid integer was passed to the Board constructor for direction." + str(direction))
 
     # places a tile randomly on the board
-    def place_new_tile(self, new_tile, direction):
-        placed = False
-        while not placed:
-            x = y = -1
-            if direction == Directions.up:
-                x = len(self.spaces) - 1
-            elif direction == Directions.right:
-                y = 0
-            elif direction == Directions.down:
-                x = 0
-            elif direction == Directions.left:
-                y = len(self.spaces[len(self.spaces) - 1]) - 1
-
-            if x < 0:
-                x = random.randint(0, len(self.spaces) - 1)
-            if y < 0:
-                y = random.randint(0, len(self.spaces[len(self.spaces) - 1]) - 1)
-
+    def place_new_tile(self, new_tile, direction, x=-1, y=-1):
+        if x > -1 and y > -1:
             if self.spaces[x][y] is None:
                 self.spaces[x][y] = new_tile
-                placed = True
+                self.score = self.calculate_score()
+                self.next_tile = Tile(self.max_value)
+            else:
+                raise InvalidTilePlacement("A tile was placed in a spot that already had a tile.")
+        else:
+            placed = False
+            while not placed:
+                x = y = -1
+                if direction == Directions.up:
+                    x = len(self.spaces) - 1
+                elif direction == Directions.right:
+                    y = 0
+                elif direction == Directions.down:
+                    x = 0
+                elif direction == Directions.left:
+                    y = len(self.spaces[len(self.spaces) - 1]) - 1
+
+                if x < 0:
+                    x = random.randint(0, len(self.spaces) - 1)
+                if y < 0:
+                    y = random.randint(0, len(self.spaces[len(self.spaces) - 1]) - 1)
+
+                if self.spaces[x][y] is None:
+                    self.spaces[x][y] = new_tile
+                    placed = True
+                    self.score = self.calculate_score()
+                    self.next_tile = Tile(self.max_value)
+
+    def has_move(self):
+        for direction in Directions:
+            try:
+                board_copy = deepcopy(self)
+                Board(board_copy, direction)
+                return True
+            except InvalidMove:
+                pass
+        return False
 
     def calculate_score(self):
         score = 0
@@ -255,3 +284,11 @@ class Board:
                     score += 3 ** (log2(cell.value / 3) + 1)
 
         return int(score)
+
+    def get_max_tile(self):
+        max_tile = 0
+        for row in self.spaces:
+            for cell in row:
+                if cell is not None and cell.value > max_tile:
+                    max_tile = cell.value
+        return max_tile

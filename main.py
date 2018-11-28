@@ -1,4 +1,4 @@
-from A_Star import a_star
+from A_Star import greedy
 import numpy
 from matplotlib import pyplot as plt
 from math import log2
@@ -9,21 +9,21 @@ if __name__ == "__main__":
     max_tiles = []
 
     for _ in range(runs):
-        score, max_tile = a_star(2500)
+        score, max_tile = greedy()
         max_tiles.append(max_tile)
 
     x_values = []
     counts = []
-    for i in range(int(log2(max(max_tiles) / 12)) + 1):
+    for i in range(max(int(log2(max(max_tiles) / 12)) + 1, 8)):
         x_values.append(12 * 2 ** i)
         counts.append(0)
 
     for tile in max_tiles:
-        counts[int(log2(tile / 12))] += 1
+        counts[max(int(log2(tile / 12)), 0)] += 1
 
     ind = numpy.arange(len(x_values))
     p = plt.bar(ind, counts)
-    plt.title("A* Playing Threes! (1000 Cap)")
+    plt.title("Greedy Playing Threes!")
     plt.xlabel("Highest Tile Achieved")
     plt.ylabel("Count")
     plt.xticks(ind, x_values)
