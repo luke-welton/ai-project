@@ -86,6 +86,7 @@ class MonteCarlo:
         return score
 
     def graph_results(self):
+        plt.figure(self.depth + 12)
         plt.plot(self.score_progress)
         plt.plot(self.playout_score_progress)
         plt.title('Predicted Score vs Actual for Depth ' + str(self.depth))
@@ -175,4 +176,4 @@ def box_results(run, data, depths, title, ylabel):
     plt.savefig(title.lower().replace(' ', '_') + ".png")
 
 # Here we go.     
-run_monte_carlo(runs=[2], depths=[25], save=True, debug=True)
+run_monte_carlo(runs=[20,20,20,20], depths=[25,50,100,200], save=True)
