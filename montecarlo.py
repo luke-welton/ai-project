@@ -143,8 +143,16 @@ def run_monte_carlo(runs=[100, 50, 10, 5, 1], depths=[50, 100, 500, 1000, 5000],
         graph_results(mc.depth + 2, moves[depth], '# of Moves for Depth ' + str(mc.depth), 'Move', save)
         graph_results(mc.depth + 3, tiles[depth], 'Highest Tile for Depth ' + str(mc.depth), 'Highest Tile', save)
 
-    box_results(mc.depth + 4, avg_scores, depths, 'Average Scores for Depths', 'Average Score')
-    box_results(mc.depth + 5, max_tiles, depths, 'Highest Tiles for Depths', 'Tile')
+    box_results(4, avg_scores, depths, 'Average Scores for Depths', 'Average Score')
+    box_results(5, max_tiles, depths, 'Highest Tiles for Depths', 'Tile')
+    for depth in depths:
+        tiles[depth].sort()
+        amounts = {}
+        for tile in tiles[depth]:
+            if tile not in amounts:
+                amounts[tile] = 0
+            amounts[tile] = amounts[tile] + 1
+        box_results(depth + 5, list(amounts.values()), list(amounts.keys()), 'Amount of Tiles for Depth ' + str(depth), 'Occurance of Tile')
 
 def graph_results(run, data, title, ytitle, save=False):
     plt.figure(run)
@@ -167,4 +175,4 @@ def box_results(run, data, depths, title, ylabel):
     plt.savefig(title.lower().replace(' ', '_') + ".png")
 
 # Here we go.     
-run_monte_carlo(runs=[1], depths=[1000], save=True, debug=True)
+run_monte_carlo(runs=[2], depths=[25], save=True, debug=True)
