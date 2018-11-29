@@ -1,35 +1,27 @@
-from A_Star import greedy
-import numpy
-from matplotlib import pyplot as plt
-from math import log2
+from expectimax import expectimax
+from expectimax import run_expectimax
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 if __name__ == "__main__":
-    runs = 100
-    max_tiles = []
+    results = run_expectimax(50, 4)
+    high_tiles = results[0]
+    high_scores = results[1]
 
-    for _ in range(runs):
-        score, max_tile = greedy()
-        max_tiles.append(max_tile)
+    objects = ('12', '24', '48', '96', '192', '384', '786', '1536')
+    y_pos = np.arange(len(objects))
+    possible_values = [12, 24, 48, 96, 192, 384, 768, 1536]
+    values = []
+    for val in possible_values:
+        values.append(high_tiles.count(val))
 
-    x_values = []
-    counts = []
-    for i in range(max(int(log2(max(max_tiles) / 12)) + 1, 8)):
-        x_values.append(12 * 2 ** i)
-        counts.append(0)
-
-    for tile in max_tiles:
-        counts[max(int(log2(tile / 12)), 0)] += 1
-
-    ind = numpy.arange(len(x_values))
-    p = plt.bar(ind, counts)
-    plt.title("Greedy Playing Threes!")
-    plt.xlabel("Highest Tile Achieved")
-    plt.ylabel("Count")
-    plt.xticks(ind, x_values)
-    plt.yticks(numpy.arange(0, max(counts), 10))
+    plt.bar(y_pos, values, align='center', alpha=0.5)
+    plt.xticks(y_pos, objects)
+    plt.xlabel('Highest Tile Achieved')
+    plt.ylabel('Count')
+    plt.title('Expectimax Search Depth 4 with Improved Heuristic')
     plt.show()
 
-
-
+    # expectimax(4)
 
