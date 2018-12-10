@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 if __name__ == "__main__":
-    results = run_expectimax(50, 4)
+    search_depth = 3
+    results = run_expectimax(1000, search_depth)
     high_tiles = results[0]
     high_scores = results[1]
 
@@ -20,8 +21,8 @@ if __name__ == "__main__":
     plt.xticks(y_pos, objects)
     plt.xlabel('Highest Tile Achieved')
     plt.ylabel('Count')
-    plt.title('Expectimax Search Depth 4 with Improved Heuristic')
+    plt.title(f'Expectimax Search Depth {search_depth} with Basic Heuristic')
     plt.show()
 
-    # expectimax(4)
+    # expectimax(3)
 
