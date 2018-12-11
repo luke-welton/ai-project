@@ -134,3 +134,31 @@ def a_star(cap=-1, print_nodes=False):
                     open_queue.enqueue(next_node)
 
     return best_board.calculate_score(), best_board.max_value
+
+
+# Picking the direction that will increase the score by the most with no backtracking
+def greedy():
+    board = Board()
+    can_move = True
+
+    while can_move:
+        best_score = 0
+        next_board = None
+        for direction in Directions:
+            try:
+                b = Board(board, direction)
+                score = b.calculate_score()
+
+                if score > best_score:
+                    best_score = score
+                    next_board = b
+            except InvalidMove:
+                continue
+
+        if next_board is not None:
+            board = next_board
+            max_tile = board.max_value
+        else:
+            can_move = False
+
+    return board.calculate_score(), board.max_value
