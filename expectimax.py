@@ -29,7 +29,7 @@ def sim_move(board, search_depth, tile_node):
             next_board = Board(prev=board, direction=direction, add_tile=False)
             node = TreeNode(next_board, tile_node.depth + 1, direction=direction)
             tile_node.add_child(node)
-            sim_place_tile2(next_board, direction, search_depth, node)
+            sim_place_tile(next_board, direction, search_depth, node)
         except InvalidMove:
             pass
 
@@ -43,7 +43,7 @@ def sim_place_tile(board, direction, search_depth, direction_node):
                     for i in range(1, 4):
                         board_copy = deepcopy(board)
                         board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction, x=x, y=y)
-                        node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_score())
+                        node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_reward())
                         direction_node.add_child(node)
         return
     elif direction_node.depth == 1:
@@ -75,7 +75,7 @@ def sim_place_tile2(board, direction, search_depth, direction_node):
         for i in range(1, 4):
             board_copy = deepcopy(board)
             board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction)
-            node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_score())
+            node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_reward())
             direction_node.add_child(node)
         return
     elif direction_node.depth == 1:
@@ -84,10 +84,36 @@ def sim_place_tile2(board, direction, search_depth, direction_node):
                 if space is None:
                     next_tile = board.next_tile
                     board_copy = deepcopy(board)
-                    board_copy.place_new_tile(next_tile, direction, x=x, y=y)
+                    board_copy.place_new_tile(next_tile, direction)
                     node = TreeNode(board_copy, direction_node.depth + 1)
                     direction_node.add_child(node)
                     sim_move(board_copy, search_depth, node)
+    else:
+        for i in range(1, 4):
+            board_copy = deepcopy(board)
+            board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction)
+            node = TreeNode(board_copy, direction_node.depth + 1)
+            direction_node.add_child(node)
+            sim_move(board_copy, search_depth, node)
+
+
+# Only looks at value of random tiles, not placement
+# Runs much faster than sim_place_tile and sim_place_tile2
+def sim_place_tile3(board, direction, search_depth, direction_node):
+    if direction_node.depth + 1 == search_depth * 2:
+        for i in range(1, 4):
+            board_copy = deepcopy(board)
+            board_copy.place_new_tile(Tile(max_value=i, force_value=True), direction)
+            node = TreeNode(board_copy, direction_node.depth + 1, value=board_copy.calculate_reward())
+            direction_node.add_child(node)
+        return
+    elif direction_node.depth == 1:
+        next_tile = board.next_tile
+        board_copy = deepcopy(board)
+        board_copy.place_new_tile(next_tile, direction)
+        node = TreeNode(board_copy, direction_node.depth + 1)
+        direction_node.add_child(node)
+        sim_move(board_copy, search_depth, node)
     else:
         for i in range(1, 4):
             board_copy = deepcopy(board)
@@ -120,11 +146,11 @@ def pick_direction(tree):
     return best_direction
 
 
-def expectimax(search_depth):
+def expectimax(search_depth, print_boards=False):
     board = Board()
-    # print(board)
+    if print_boards:
+        print(board)
     while True:
-        # Board will not accept a move if it does not combine tiles
         if not board.has_move():
             score = board.calculate_score()
             max_tile = board.get_max_tile()
@@ -133,18 +159,32 @@ def expectimax(search_depth):
         sim_move(board, search_depth, tree_root)
         direction = pick_direction(tree_root)
         board = Board(prev=board, direction=direction)
-        # print(board)
+        if print_boards:
+            print("Score = " + str(board.calculate_score()))
+            print(board)
 
 
 def run_expectimax(iterations, search_depth):
+    # These lines print trial data to output files
+    # tiles_file = open(f'data/new_high_tiles_{iterations}_{search_depth}.txt', 'w')
+    # scores_file = open(f'data/new_high_scores_{iterations}_{search_depth}.txt', 'w')
     score_sum = 0
     max_tile_sum = 0
     high_score = 0
+    high_scores = []
     high_max_tile = 0
+    high_tiles = []
     for i in range(iterations):
         ret = expectimax(search_depth)
         score = ret[0]
         max_tile = ret[1]
+        high_scores.append(high_score)
+        high_tiles.append(max_tile)
+        print("\nIteration " + str(i))
+        print(score)
+        print(max_tile)
+        tiles_file.write(str(max_tile))
+        scores_file.write(str(score))
         score_sum += score
         max_tile_sum += max_tile
         if score > high_score:
@@ -159,3 +199,4 @@ def run_expectimax(iterations, search_depth):
     print("Average max tile with search depth of " + str(search_depth) + ": " + str(avg_max_tile))
     print("Highest max tile with search depth of " + str(search_depth) + ": " + str(high_max_tile))
     print("\n\n\n")
+    return [high_tiles, high_scores]

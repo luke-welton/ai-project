@@ -74,6 +74,15 @@ class Tile:
         if not is_valid(self.value):
             raise InvalidTileValue("The value of the tile was not 1, 2, or 3(2)^n for any n.")
 
+    def can_combine(self, other):
+        if self.value == 1 and other.value == 2:
+            return True
+        if self.value == 2 and other.value == 1:
+            return True
+        if self.value > 2 and self.value == other.value:
+            return True
+        return False
+
 
 class Directions(Enum):
     up = 0
@@ -292,3 +301,36 @@ class Board:
                 if cell is not None and cell.value > max_tile:
                     max_tile = cell.value
         return max_tile
+
+    @staticmethod
+    def tile_man_distance(x1, y1, x2, y2):
+        return abs(x1 - x2) + abs(y1 - y2)
+
+    # New heuristic did not make as much of a difference as search depth, so we just used the score as our heuristic to
+    # increase efficiency
+    def calculate_reward(self):
+        score = self.calculate_score()
+        # tile_closeness = 0
+        # open_spaces = 0
+        #
+        # for x1, row1 in enumerate(self.spaces):
+        #     for y1, cell1 in enumerate(row1):
+        #         if cell1 is None:
+        #             open_spaces += 1
+        #             continue
+        #         for x2, row2 in enumerate(self.spaces):
+        #             for y2, cell2 in enumerate(row2):
+        #                 if cell2 is None:
+        #                     continue
+        #                 if cell1.can_combine(cell2):
+        #                     man_dist = Board.tile_man_distance(x1, y1, x2, y2)
+        #                     if 0 < man_dist < 3:
+        #                         # print(reward)
+        #                         logmax = int(log2(self.max_value / 3) + 1)
+        #                         if cell1.can_combine(cell2):
+        #                             tile_closeness += man_dist * int(logmax - log2(cell1.value / 3) - 1)
+        #                         elif cell1.value != cell2.value:
+        #                             tile_closeness += man_dist * logmax
+        #
+        # reward = (0.1 * tile_closeness) + score
+        return score
