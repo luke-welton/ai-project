@@ -17,13 +17,13 @@ if __name__ == "__main__":
 
     # Monte Carlo
     if selection == 0:
-        print("Running Monte Carlo...")
+        print("Running Monte Carlo at depths [50,100,500,1000] for 100 runs each...")
         # Monte Carlo
         run_monte_carlo(runs=[100,100,100,100], depths=[50,100,500,1000], debug=False, print_results=False, save=True)
     
     # Expectimax
     elif selection == 1:
-        print("Running Expectimax...")
+        print("Running Expectimax for 1000 runs...")
         search_depth = 3
         results = run_expectimax(1000, search_depth)
         high_tiles = results[0]
@@ -45,12 +45,12 @@ if __name__ == "__main__":
     
     # A Star
     elif selection == 2: 
-        print("Running A*...")
+        print("Running A* wih 2500 tile cap...")
         runs = 100
         max_tiles = []
 
         for _ in range(runs):
-            score, max_tile = a_star(100)
+            score, max_tile = a_star(2500)
             max_tiles.append(max_tile)
 
         x_values = []
