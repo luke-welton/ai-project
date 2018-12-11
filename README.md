@@ -32,7 +32,7 @@ ___
 
 ## A Star
 
-[a_star](../a_star.py) contains our implementaion of A* search method. The A* search method allows us to essentially search 
+[a_star](a_star.py) contains our implementaion of A* search method. The A* search method allows us to essentially search 
 for a path to the best possible score for Threes! with backtracking. This method was good for us to use as a baseline for 
 possible high scores for Threes! and could be used to generate data for more advanced reinforcement learning if we were to 
 expand further on this project. 
@@ -46,7 +46,7 @@ ___
 
 ## Expectimax
 
-[expectimax](../expectimax.py) contains our implementaion of Expectimax. This file contains the method 
+[expectimax](expectimax.py) contains our implementaion of Expectimax. This file contains the method 
 `expectimax(search_depth, print_boards=False)` 
 
 The parameters are defined by the following:
@@ -64,7 +64,7 @@ ___
 
 ## Monte Carlo
  
-[montecarlo](../montecarlo.py) contains our implementation of MonteCarlo. This file contains `run_monte_carlo(runs=[100, 50, 10, 5, 1], depths=[50, 100, 500, 1000, 5000], debug=False, print_results=True, save=False)`  
+[montecarlo](montecarlo.py) contains our implementation of MonteCarlo. This file contains `run_monte_carlo(runs=[100, 50, 10, 5, 1], depths=[50, 100, 500, 1000, 5000], debug=False, print_results=True, save=False)`  
 
 The parameters are defined by the following:  
 - runs = The number of runs to make for each depth.
