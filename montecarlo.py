@@ -93,7 +93,7 @@ class MonteCarlo:
         plt.ylabel('Score')
         plt.xlabel('Moves')
         #plt.show()
-        plt.savefig(str(self.depth) + '_converge.png')
+        plt.savefig('./output/' + str(self.depth) + '_converge.png')
         return True
 
 # Collect data on the MonteCarlo implementation.
@@ -130,7 +130,7 @@ def run_monte_carlo(runs=[100, 50, 10, 5, 1], depths=[50, 100, 500, 1000, 5000],
                 min_tile = mc.highest_tile
             if mc.highest_tile > max_tile:
                 max_tile = mc.highest_tile
-            mc.graph_results()
+        mc.graph_results()
         end = int(round(time.time() * 1000))
         elapsed = (end - start) / 1000
         avg_score /= runs[index]
@@ -162,7 +162,7 @@ def graph_results(run, data, title, ytitle, save=False):
     plt.ylabel(ytitle)
     plt.xlabel('Trial #')
     if save:
-        plt.savefig(title.lower().replace(' ', '_') + ".png")
+        plt.savefig('./output/' + title.lower().replace(' ', '_') + ".png")
     else:
         plt.plot()
 
@@ -173,7 +173,7 @@ def box_results(run, data, depths, title, ylabel):
     plt.xticks(y_pos, depths)
     plt.title(title)
     plt.ylabel(ylabel)
-    plt.savefig(title.lower().replace(' ', '_') + ".png")
+    plt.savefig('./output/' + title.lower().replace(' ', '_') + ".png")
 
 # Here we go.     
-run_monte_carlo(runs=[20,20,20,20], depths=[25,50,100,200], save=True)
+run_monte_carlo(runs=[100,100,100,100], depths=[50,100,500,1000], save=True)
