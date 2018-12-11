@@ -1,0 +1,4 @@
+200 average: 3556.6 min :48 max: 768
+100 average: 1842.3 min :24 max: 384
+50  average: 1532.4 min: 24 max: 192
+25  average: 1357.8 min: 12 max: 192

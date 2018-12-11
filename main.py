@@ -2,11 +2,17 @@ import numpy as np
 from matplotlib import pyplot as plt
 from math import log2
 
+from montecarlo import run_monte_carlo
 from expectimax import expectimax
 from expectimax import run_expectimax
 from A_Star import greedy
 
 if __name__ == "__main__":
+
+    # Monte Carlo
+    run_monte_carlo(runs=[100,100,100,100], depths=[50,100,500,1000], save=True)
+
+    # Expectimax
     search_depth = 3
     results = run_expectimax(1000, search_depth)
     high_tiles = results[0]
@@ -28,6 +34,7 @@ if __name__ == "__main__":
 
     # expectimax(3)
 
+    # Greedy
     runs = 100
     max_tiles = []
     total_score = 0
