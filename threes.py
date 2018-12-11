@@ -93,7 +93,7 @@ class Directions(Enum):
 
 
 class Board:
-    def __init__(self, prev=None, direction=-1, add_tile=True):
+    def __init__(self, prev=None, direction=None, add_tile=True):
         if prev is None:
             self.max_value = 3
             self.spaces = []
@@ -116,7 +116,7 @@ class Board:
         else:
             self.max_value = prev.max_value
             self.spaces = deepcopy(prev.spaces)
-            if direction > 0:
+            if direction != None:
                 self.calculate_tiles(direction)
                 self.next_tile = None
 
