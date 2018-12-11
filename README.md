@@ -20,7 +20,7 @@ $ python main.py
 * [Expectimax](#expectimax)
 * [Monte Carlo](#monte-carlo)
 
-#### Threes
+## Threes
 
 [threes](threes.py) contains our implementation of the game Threes! This file allows us to create a new game board, make 
 moves on that board, place a new random tile, and calculate the board's current score. We use this implementation of the game 
@@ -28,29 +28,36 @@ in our algorithms to simulate playouts of the game in order to see which methods
 
 ___
 
-#### A Star
+## A Star
 
 [a_star](../a_star.py) contains our implementaion of A* search method. The A* search method allows us to essentially search 
 for a path to the best possible score for Threes! with backtracking. This method was good for us to use as a baseline for 
 possible high scores for Threes! and could be used to generate data for more advanced reinforcement learning if we were to 
 expand further on this project. 
 
-```
-# Run A*
+This file contains the method `a_star(cap=-1, print_nodes=False)`
+The parameters are defined by the following:
+- cap = The max score that A* will run to
+- print_nodes = Whether or not each move board checked will be printed to the console
 
-# Default parameters for a_star() are cap=-1, which means there is no cap on the score a_star can reach
-# and print_nodes=False, which means each board will not be displayed
-
-a_star()
-```
 ___
 
-#### Expectimax
+## Expectimax
 
 [expectimax](../expectimax.py) contains our implementaion of Expectimax. This file contains the method 
-`expectimax(search_depth, print_boards=False)` which allows the user to run one trial of expectimax at a specified search depth, 
-and allows the user to either display each move or just the final score achieved. The method `run_expectimax(iterations, 
-search_depth)` allows the user to run a specified number of iterations of Expectimax at a specified search depth.
+`expectimax(search_depth, print_boards=False)` 
+
+The parameters are defined by the following:
+- search_depth = The number of moves Expectimax will look ahead for each move it makes
+- print_boards = Whether or not each move Expectimax makes is printed to the screen
+
+The file also contains the method `run_expectimax(iterations, search_depth)` 
+
+The parameters are defined by the following:
+- iterations = how many runs of Expectimax(playing Threes! until it loses) should be simulated
+- search_depth = The number of moves Expectimax will look ahead for each move it makes
+
+
 ___
 
 ## Monte Carlo
