@@ -176,4 +176,4 @@ def box_results(run, data, depths, title, ylabel):
     plt.savefig('./output/' + title.lower().replace(' ', '_') + ".png")
 
 # Here we go.     
-run_monte_carlo(runs=[100,100,100,100], depths=[50,100,500,1000], save=True)
+#run_monte_carlo(runs=[100,100,100,100], depths=[50,100,500,1000], save=True)

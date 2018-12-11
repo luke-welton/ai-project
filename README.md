@@ -55,3 +55,11 @@ ___
 
 ## Monte Carlo
  
+[montecarlo](../montecarlo.py) contains our implementation of MonteCarlo. This file contains `run_monte_carlo(runs=[100, 50, 10, 5, 1], depths=[50, 100, 500, 1000, 5000], debug=False, print_results=True, save=False)`  
+
+The parameters are defined by the following:  
+- runs = The number of runs to make for each depth.
+- depths = The amount of random playouts to make per run.
+- debug = The option to print extraneous information.
+- print_results = The option to print results as each run is being executed.
+- save = The option to save final results to an output folder. If this is False they will open in windows instead.
