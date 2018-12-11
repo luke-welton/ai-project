@@ -9,7 +9,7 @@ COMP 5600: Artificial Intelligence Project on Threes!
 
 # Download all files
 
-# With Python3
+# Run with Python 3.6 or higher
 # Provide an algorithm selection. Use [0=montecarlo, 1=expectimax, 2=a_star, 3=greedy].
 $ python main.py arg
 
